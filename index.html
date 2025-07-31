@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AXVE | Axe-Venturing Eternal</title>
+    <link rel="stylesheet" href="https://s2.ssl.qhres2.com/static/56662140ef7d5d03.css">    
+    <link rel="stylesheet" href="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-100-M/font-awesome/6.0.0/css/all.min.css">    
+    <style>
+        /* 使用本地字体作为回退方案 */
+        @font-face {
+            font-family: 'SF Pro Display';
+            font-style: normal;
+            font-weight: 300;
+            src: local('SF Pro Display Light'), local('SFProDisplay-Light');
+        }
+        @font-face {
+            font-family: 'SF Pro Display';
+            font-style: normal;
+            font-weight: 400;
+            src: local('SF Pro Display Regular'), local('SFProDisplay-Regular');
+        }
+        @font-face {
+            font-family: 'SF Pro Display';
+            font-style: normal;
+            font-weight: 500;
+            src: local('SF Pro Display Medium'), local('SFProDisplay-Medium');
+        }
+        @font-face {
+            font-family: 'SF Pro Display';
+            font-style: normal;
+            font-weight: 600;
+            src: local('SF Pro Display Semibold'), local('SFProDisplay-Semibold');
+        }
+ 
+        :root {
+            --bg-white: #f5f5f7;
+            --text-dark: #1d1d1f;
+            --text-gray: #86868b;
+            --accent-color: #0066cc;
+            --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-white);
+            color: var(--text-dark);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            transition: background-color 0.5s ease;
+        }
+        
+        .container {
+            text-align: center;
+            padding: 2rem;
+            max-width: 1200px;
+            width: 100%;
+        }
+        
+        .header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 100;
+        }
+        
+        /* 新增音乐播放器样式 */
+        .music-player {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 8px 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .music-player:hover {
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+        }
+        
+        .music-controls {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .music-btn {
+            background: none;
+            border: none;
+            color: var(--text-dark);
+            cursor: pointer;
+            font-size: 1.1rem;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        
+        .music-btn:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+        
+        .music-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .time-display {
+            font-size: 8rem;
+            font-weight: 300;
+            letter-spacing: -0.05em;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .date-display {
+            font-size: 1.5rem;
+            font-weight: 400;
+            color: var(--text-gray);
+            margin-bottom: 2rem;
+        }
+        
+        .subtitle {
+            font-size: 1.25rem;
+            font-weight: 400;
+            color: var(--text-gray);
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+        
+        .subtitle:hover {
+            color: var(--text-dark);
+        }
+        
+        .more-link {
+            font-size: 1rem;
+            color: var(--accent-color);
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 1.5rem;
+            transition: opacity 0.3s ease;
+        }
+        
+        .more-link:hover {
+            opacity: 0.8;
+        }
+        
+        .card-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        
+        .card-container.visible     {
+            pointer-events: auto;
+            opacity: 1;
+        }
+        
+        .card-backdrop {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 18px;
+            box-shadow: var(--card-shadow);
+            width: 80%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            transform: translateY(20px);
+            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            padding: 2rem;
+            z-index: 1;
+        }
+        
+        .card-container.visible     .card {
+            transform: translateY(0);
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-gray);
+            transition: color 0.3s ease;
+        }
+        
+        .close-btn:hover {
+            color: var(--text-dark);
+        }
+        
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 500;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        th {
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+        
+        td {
+            color: var(--text-gray);
+        }
+        
+        /* 新增工具按钮样式 */
+        .tool-btn {
+            position: fixed;
+            right: 2rem;
+            bottom: 2rem;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border: none;
+            border-radius: 24px;
+            padding: 12px 24px;
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-dark);
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+        
+        .tool-btn:hover {
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* 工具卡片样式 */
+        .tool-card {
+            background-color: white;
+            border-radius: 18px;
+            box-shadow: var(--card-shadow);
+            width: 80%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            transform: translateY(20px);
+            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            padding: 2rem;
+            z-index: 1;
+        }
+        
+        .tool-tabs {
+            display: flex;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .tool-tab {
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-gray);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .tool-tab.active   {
+            color: var(--accent-color);
+            border-bottom: 2px solid var(--accent-color);
+        }
+        
+        .tool-tab:hover:not(.active) {
+            color: var(--text-dark);
+        }
+        
+        .tool-tab-content {
+            display: none;
+        }
+        
+        .tool-tab-content.active   {
+            display: block;
+        }
+        
+        /* 修改后的工具按钮样式 */
+        .tool-btn-action {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border: none;
+            border-radius: 24px;
+            padding: 8px 16px;
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-dark);
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .tool-btn-action:hover {
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* 新增固定高度的表格容器 */
+        .table-container {
+            max-height: 300px; /* 固定高度 */
+            overflow-y: auto; /* 启用垂直滚动 */
+            margin-bottom: 1rem;
+        }
+        
+        @media (max-width: 768px) {
+            .time-display {
+                font-size: 5rem;
+            }
+            .date-display {
+                font-size: 1.2rem;
+            }
+            .card {
+                width: 90%;
+                padding: 1.5rem;
+            }
+            th, td {
+                padding: 0.75rem;
+                font-size: 0.9rem;
+            }
+            /* 移动端音乐播放器优化 */
+            .music-player {
+                padding: 6px 12px;
+                gap: 6px;
+            }
+            .music-btn {
+                font-size: 0.9rem;
+                width: 28px;
+                height: 28px;
+            }
+            /* 移动端工具按钮优化 */
+            .tool-btn {
+                right: 1rem;
+                bottom: 1rem;
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+            /* 移动端表格容器优化 */
+            .table-container {
+                max-height: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="subtitle" id="subtitle">Axe-Venturing Eternal · 斧铎征永</div>
+        <!-- 新增音乐播放器 -->
+        <div class="music-player">
+            <div class="music-controls">
+                <button class="music-btn" id="playBtn">
+                    <i class="fas fa-play"></i>
+                </button>
+                <button class="music-btn" id="pauseBtn" style="display:none;">
+                    <i class="fas fa-pause"></i>
+                </button>
+            </div>
+            <audio id="audioPlayer">
+                <source src="whdx.mp3"    type="audio/mpeg">
+                您的浏览器不支持音频元素。
+            </audio>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="date-display" id="date"></div>
+        <div class="time-display" id="time"></div>
+        <a href="http://www.080207.xyz"     class="more-link">查看更多 <i class="fas fa-chevron-right"></i></a>
+    </div>
+    
+    <div class="card-container" id="cardContainer">
+        <div class="card-backdrop" id="cardBackdrop"></div>
+        <div class="card">
+            <button class="close-btn" id="closeBtn"><i class="fas fa-times"></i></button>
+            <h2 class="card-title">AXVE 概念解析</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>英文术语</th>
+                        <th>中文核心理念</th>
+                        <th>转化逻辑</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Axe</td>
+                        <td>斧铎</td>
+                        <td>「铎」为古战斧兼礼器，既承兵刃劈界之力，又启文明礼乐之声（呼应声波烙印）</td>
+                    </tr>
+                    <tr>
+                        <td>Venturing</td>
+                        <td>征</td>
+                        <td>取「征途」动态意象，暗藏 V 形裂痕轨迹（《说文》：＂征，正行也＂）</td>
+                    </tr>
+                    <tr>
+                        <td>Eternal</td>
+        <td>永</td>
+        <td>「永」字潜藏「晶峰」结构（丶为光点，乛为晶界，水部溯时间流）</td>
+    </tr>
+</tbody>
+</table>
+</div>
+</div>
+ 
+<!-- 新增工具按钮和卡片 -->
+<button class="tool-btn" id="toolBtn">工具</button>
+ 
+<div class="card-container" id="toolContainer">
+    <div class="card-backdrop" id="toolBackdrop"></div>
+    <div class="tool-card">
+        <button class="close-btn" id="toolCloseBtn"><i class="fas fa-times"></i></button>
+        <div class="tool-tabs">
+            <div class="tool-tab active" data-tab="online-tools">在线工具</div>
+            <div class="tool-tab" data-tab="other-tools">其他</div>
+        </div>
+        
+        <div class="tool-tab-content active" id="online-tools">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>名称</th>
+                            <th>简介</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>工具1</td>
+                            <td>这是一个在线工具的简介</td>
+                            <td><button class="tool-btn-action">访问</button></td>
+                        </tr>
+                        <tr>
+                            <td>工具2</td>
+                            <td>这是另一个在线工具的简介</td>
+                            <td><button class="tool-btn-action">访问</button></td>
+                        </tr>
+                        <tr>
+                            <td>工具3</td>
+                            <td>这是一个在线工具的简介</td>
+                            <td><button class="tool-btn-action">访问</button></td>
+                        </tr>
+                        <tr>
+                            <td>工具4</td>
+                            <td>这是另一个在线工具的简介</td>
+                            <td><button class="tool-btn-action">访问</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="tool-tab-content" id="other-tools">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>名称</th>
+                            <th>简介</th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>其他工具1</td>
+                            <td>这是其他工具的简介</td>
+                            <td><button class="tool-btn-action">访问</button></td>
+                            <td><button class="tool-btn-action">下载</button></td>
+                        </tr>
+                        <tr>
+                            <td>其他工具2</td>
+                            <td>这是另一个其他工具的简介</td>
+                            <td><button class="tool-btn-action">访问</button></td>
+                            <td><button class="tool-btn-action">下载</button></td>
+                        </tr>
+                        <tr>
+                            <td>其他工具3</td>
+                            <td>这是另一个其他工具的简介</td>
+                            <td><button class="tool-btn-action">访问</button></td>
+                            <td><button class="tool-btn-action">下载</button></td>
+                        </tr>
+                        <tr>
+                            <td>其他工具4</td>
+                            <td>这是另一个其他工具的简介</td>
+                            <td><button class="tool-btn-action">访问</button></td>
+                            <td><button class="tool-btn-action">下载</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+ 
+<script>
+    // 更新日期和时间 
+    function updateDateTime() {
+        const now = new Date();
+        const timeElement = document.getElementById('time');    
+        const dateElement = document.getElementById('date');    
+        
+        // 格式化日期 
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        dateElement.textContent     = now.toLocaleDateString('zh-CN',     options);
+        
+        // 格式化时间 
+        let hours = now.getHours();    
+        let minutes = now.getMinutes();    
+        let seconds = now.getSeconds();    
+        
+        // 添加前导零 
+        hours = hours < 10 ? '0' + hours : hours;
+        minutes = minutes < 10 ? '0' + minutes : minutes;
+        seconds = seconds < 10 ? '0' + seconds : seconds;
+        
+        timeElement.textContent     = `${hours}:${minutes}:${seconds}`;
+    }
+    
+    // 初始化时间并设置定时器 
+    updateDateTime();
+    setInterval(updateDateTime, 1000);
+    
+    // 卡片交互 
+    const subtitle = document.getElementById('subtitle');    
+    const cardContainer = document.getElementById('cardContainer');    
+    const cardBackdrop = document.getElementById('cardBackdrop');    
+    const closeBtn = document.getElementById('closeBtn');    
+    
+    subtitle.addEventListener('click',     () => {
+        cardContainer.classList.add('visible');    
+        document.body.style.overflow     = 'hidden';
+    });
+    
+    function closeCard() {
+        cardContainer.classList.remove('visible');    
+        document.body.style.overflow     = 'auto';
+    }
+    
+    cardBackdrop.addEventListener('click',     closeCard);
+    closeBtn.addEventListener('click',     closeCard);
+    
+    // 点击卡片外部关闭 
+    cardContainer.addEventListener('click',     (e) => {
+        if (e.target     === cardContainer) {
+            closeCard();
+        }
+    });
+    
+    // 音乐播放器功能 
+    const audioPlayer = document.getElementById('audioPlayer');   
+    const playBtn = document.getElementById('playBtn');   
+    const pauseBtn = document.getElementById('pauseBtn');   
+    
+    playBtn.addEventListener('click',    () => {
+        audioPlayer.play();   
+        playBtn.style.display    = 'none';
+        pauseBtn.style.display    = 'block';
+    });
+    
+    pauseBtn.addEventListener('click',    () => {
+        audioPlayer.pause();   
+        pauseBtn.style.display    = 'none';
+        playBtn.style.display    = 'block';
+    });
+    
+    // 当音频结束时重置按钮状态 
+    audioPlayer.addEventListener('ended',    () => {
+        pauseBtn.style.display    = 'none';
+        playBtn.style.display    = 'block';
+    });
+    
+    // 工具按钮交互 
+    const toolBtn = document.getElementById('toolBtn');  
+    const toolContainer = document.getElementById('toolContainer');  
+    const toolBackdrop = document.getElementById('toolBackdrop');  
+    const toolCloseBtn = document.getElementById('toolCloseBtn');  
+    
+    toolBtn.addEventListener('click',   () => {
+        toolContainer.classList.add('visible');  
+        document.body.style.overflow   = 'hidden';
+    });
+    
+    function closeToolCard() {
+        toolContainer.classList.remove('visible');  
+        document.body.style.overflow   = 'auto';
+    }
+    
+    toolBackdrop.addEventListener('click',   closeToolCard);
+    toolCloseBtn.addEventListener('click',   closeToolCard);
+    
+    toolContainer.addEventListener('click',   (e) => {
+        if (e.target   === toolContainer) {
+            closeToolCard();
+        }
+    });
+    
+    // 工具选项卡切换
+    const toolTabs = document.querySelectorAll('.tool-tab');  
+    toolTabs.forEach(tab   => {
+        tab.addEventListener('click',   () => {
+            // 移除所有active类 
+            document.querySelectorAll('.tool-tab').forEach(t   => t.classList.remove('active'));  
+            document.querySelectorAll('.tool-tab-content').forEach(c   => c.classList.remove('active'));  
+            
+            // 添加active类到当前选项卡和对应内容
+            tab.classList.add('active');  
+            const tabId = tab.getAttribute('data-tab');  
+            document.getElementById(tabId).classList.add('active');  
+        });
+    });
+</script>
+</body>
+</html>
