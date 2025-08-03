@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AXVE | Axe-Venturing Eternal</title>
-    <link rel="stylesheet" href="https://s2.ssl.qhres2.com/static/56662140ef7d5d03.css">    
-    <link rel="stylesheet" href="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-100-M/font-awesome/6.0.0/css/all.min.css">    
+    <link rel="stylesheet" href="https://s2.ssl.qhres2.com/static/56662140ef7d5d03.css">     
+    <link rel="stylesheet" href="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-100-M/font-awesome/6.0.0/css/all.min.css">     
     <style>
         /* 使用本地字体作为回退方案 */
         @font-face {
@@ -176,7 +176,7 @@
             transition: opacity 0.5s ease;
         }
         
-        .card-container.visible     {
+        .card-container.visible      {
             pointer-events: auto;
             opacity: 1;
         }
@@ -206,7 +206,7 @@
             z-index: 1;
         }
         
-        .card-container.visible     .card {
+        .card-container.visible      .card {
             transform: translateY(0);
         }
         
@@ -311,7 +311,7 @@
             transition: all 0.3s ease;
         }
         
-        .tool-tab.active   {
+        .tool-tab.active    {
             color: var(--accent-color);
             border-bottom: 2px solid var(--accent-color);
         }
@@ -324,7 +324,7 @@
             display: none;
         }
         
-        .tool-tab-content.active   {
+        .tool-tab-content.active    {
             display: block;
         }
         
@@ -398,7 +398,7 @@
 <body>
     <div class="header">
         <div class="subtitle" id="subtitle">Axe-Venturing Eternal · 斧铎征永</div>
-        <!-- 新增音乐播放器 -->
+        <!-- 修改后的音乐播放器 -->
         <div class="music-player">
             <div class="music-controls">
                 <button class="music-btn" id="playBtn">
@@ -408,8 +408,8 @@
                     <i class="fas fa-pause"></i>
                 </button>
             </div>
+            <!-- 移除了固定的音乐源 -->
             <audio id="audioPlayer">
-                <source src="whdx.mp3"    type="audio/mpeg">
                 您的浏览器不支持音频元素。
             </audio>
         </div>
@@ -418,7 +418,7 @@
     <div class="container">
         <div class="date-display" id="date"></div>
         <div class="time-display" id="time"></div>
-        <a href="http://www.080207.xyz"     class="more-link">查看更多 <i class="fas fa-chevron-right"></i></a>
+        <a href="http://www.080207.xyz"      class="more-link">查看更多 <i class="fas fa-chevron-right"></i></a>
     </div>
     
     <div class="card-container" id="cardContainer">
@@ -550,24 +550,24 @@
     // 更新日期和时间 
     function updateDateTime() {
         const now = new Date();
-        const timeElement = document.getElementById('time');    
-        const dateElement = document.getElementById('date');    
+        const timeElement = document.getElementById('time');     
+        const dateElement = document.getElementById('date');     
         
         // 格式化日期 
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-        dateElement.textContent     = now.toLocaleDateString('zh-CN',     options);
+        dateElement.textContent      = now.toLocaleDateString('zh-CN',      options);
         
         // 格式化时间 
-        let hours = now.getHours();    
-        let minutes = now.getMinutes();    
-        let seconds = now.getSeconds();    
+        let hours = now.getHours();     
+        let minutes = now.getMinutes();     
+        let seconds = now.getSeconds();     
         
         // 添加前导零 
         hours = hours < 10 ? '0' + hours : hours;
         minutes = minutes < 10 ? '0' + minutes : minutes;
         seconds = seconds < 10 ? '0' + seconds : seconds;
         
-        timeElement.textContent     = `${hours}:${minutes}:${seconds}`;
+        timeElement.textContent      = `${hours}:${minutes}:${seconds}`;
     }
     
     // 初始化时间并设置定时器 
@@ -575,91 +575,122 @@
     setInterval(updateDateTime, 1000);
     
     // 卡片交互 
-    const subtitle = document.getElementById('subtitle');    
-    const cardContainer = document.getElementById('cardContainer');    
-    const cardBackdrop = document.getElementById('cardBackdrop');    
-    const closeBtn = document.getElementById('closeBtn');    
+    const subtitle = document.getElementById('subtitle');     
+    const cardContainer = document.getElementById('cardContainer');     
+    const cardBackdrop = document.getElementById('cardBackdrop');     
+    const closeBtn = document.getElementById('closeBtn');     
     
-    subtitle.addEventListener('click',     () => {
-        cardContainer.classList.add('visible');    
-        document.body.style.overflow     = 'hidden';
+    subtitle.addEventListener('click',      () => {
+        cardContainer.classList.add('visible');     
+        document.body.style.overflow      = 'hidden';
     });
     
     function closeCard() {
-        cardContainer.classList.remove('visible');    
-        document.body.style.overflow     = 'auto';
+        cardContainer.classList.remove('visible');     
+        document.body.style.overflow      = 'auto';
     }
     
-    cardBackdrop.addEventListener('click',     closeCard);
-    closeBtn.addEventListener('click',     closeCard);
+    cardBackdrop.addEventListener('click',      closeCard);
+    closeBtn.addEventListener('click',      closeCard);
     
     // 点击卡片外部关闭 
-    cardContainer.addEventListener('click',     (e) => {
-        if (e.target     === cardContainer) {
+    cardContainer.addEventListener('click',      (e) => {
+        if (e.target      === cardContainer) {
             closeCard();
         }
     });
     
     // 音乐播放器功能 
-    const audioPlayer = document.getElementById('audioPlayer');   
-    const playBtn = document.getElementById('playBtn');   
-    const pauseBtn = document.getElementById('pauseBtn');   
+    const audioPlayer = document.getElementById('audioPlayer');    
+    const playBtn = document.getElementById('playBtn');    
+    const pauseBtn = document.getElementById('pauseBtn');    
     
-    playBtn.addEventListener('click',    () => {
-        audioPlayer.play();   
-        playBtn.style.display    = 'none';
-        pauseBtn.style.display    = 'block';
+    // 音乐文件列表（根据要求添加）
+    const musicFiles = [
+        '《写给一个人》.mp3',
+        '《前任下世》.mp3',
+        '《嘉宾》.mp3',
+        '《恋爱单行道》.mp3',
+        '《无悔当下》.mp3',
+        '晚风心里吹》.mp3',
+        '《机场北》.mp3',
+        '《流言伴侣》.mp3',
+        '《稀客》.mp3',
+        '《约定》.mp3'
+    ];
+    
+    // 随机选择音乐并设置源 
+    function setRandomMusic() {
+        const randomIndex = Math.floor(Math.random()  * musicFiles.length); 
+        const selectedMusic = musicFiles[randomIndex];
+        audioPlayer.src  = 'music/' + encodeURIComponent(selectedMusic);
+        audioPlayer.load(); 
+        console.log(' 已选择随机音乐:', selectedMusic);
+    }
+    
+    // 页面加载时设置随机音乐 
+    setRandomMusic();
+    
+    playBtn.addEventListener('click',     () => {
+        audioPlayer.play();    
+        playBtn.style.display     = 'none';
+        pauseBtn.style.display     = 'block';
     });
     
-    pauseBtn.addEventListener('click',    () => {
-        audioPlayer.pause();   
-        pauseBtn.style.display    = 'none';
-        playBtn.style.display    = 'block';
+    pauseBtn.addEventListener('click',     () => {
+        audioPlayer.pause();    
+        pauseBtn.style.display     = 'none';
+        playBtn.style.display     = 'block';
     });
     
     // 当音频结束时重置按钮状态 
-    audioPlayer.addEventListener('ended',    () => {
-        pauseBtn.style.display    = 'none';
-        playBtn.style.display    = 'block';
+    audioPlayer.addEventListener('ended',     () => {
+        pauseBtn.style.display     = 'none';
+        playBtn.style.display     = 'block';
     });
     
     // 工具按钮交互 
-    const toolBtn = document.getElementById('toolBtn');  
-    const toolContainer = document.getElementById('toolContainer');  
-    const toolBackdrop = document.getElementById('toolBackdrop');  
-    const toolCloseBtn = document.getElementById('toolCloseBtn');  
+    const toolBtn = document.getElementById('toolBtn'); 
+    const toolContainer = document.getElementById('toolContainer'); 
+    const toolBackdrop = document.getElementById('toolBackdrop'); 
+    const toolCloseBtn = document.getElementById('toolCloseBtn'); 
     
-    toolBtn.addEventListener('click',   () => {
-        toolContainer.classList.add('visible');  
-        document.body.style.overflow   = 'hidden';
+    toolBtn.addEventListener('click',  () => {
+        toolContainer.classList.add('visible'); 
+        document.body.style.overflow  = 'hidden';
     });
     
     function closeToolCard() {
-        toolContainer.classList.remove('visible');  
-        document.body.style.overflow   = 'auto';
+        toolContainer.classList.remove('visible'); 
+        document.body.style.overflow  = 'auto';
     }
     
-    toolBackdrop.addEventListener('click',   closeToolCard);
-    toolCloseBtn.addEventListener('click',   closeToolCard);
+    toolBackdrop.addEventListener('click',  closeToolCard);
+    toolCloseBtn.addEventListener('click',  closeToolCard);
     
-    toolContainer.addEventListener('click',   (e) => {
-        if (e.target   === toolContainer) {
+    toolContainer.addEventListener('click',  (e) => {
+        if (e.target  === toolContainer) {
             closeToolCard();
         }
     });
     
-    // 工具选项卡切换
-    const toolTabs = document.querySelectorAll('.tool-tab');  
-    toolTabs.forEach(tab   => {
-        tab.addEventListener('click',   () => {
-            // 移除所有active类 
-            document.querySelectorAll('.tool-tab').forEach(t   => t.classList.remove('active'));  
-            document.querySelectorAll('.tool-tab-content').forEach(c   => c.classList.remove('active'));  
+    // 标签页切换
+    const toolTabs = document.querySelectorAll('.tool-tab'); 
+    toolTabs.forEach(tab  => {
+        tab.addEventListener('click',  () => {
+            // 移除所有活动标签 
+            toolTabs.forEach(t  => t.classList.remove('active')); 
+            // 设置当前标签为活动 
+            tab.classList.add('active'); 
             
-            // 添加active类到当前选项卡和对应内容
-            tab.classList.add('active');  
-            const tabId = tab.getAttribute('data-tab');  
-            document.getElementById(tabId).classList.add('active');  
+            // 隐藏所有内容
+            document.querySelectorAll('.tool-tab-content').forEach(content  => {
+                content.classList.remove('active'); 
+            });
+            
+            // 显示对应内容 
+            const tabId = tab.getAttribute('data-tab'); 
+            document.getElementById(tabId).classList.add('active'); 
         });
     });
 </script>
