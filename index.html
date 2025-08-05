@@ -601,7 +601,7 @@
     <div class="card website-card">
         <button class="close-btn" id="websiteCloseBtn"><i class="fas fa-times"></i></button>
         <iframe id="webFrame"></iframe>
-        <button class="visit-btn" onclick="window.open('http://www.080207.xyz', '_blank')">访问</button>
+        <button class="visit-btn" onclick="window.open('https://www.080207.xyz', '_blank')">访问</button>
     </div>
 </div>
  
@@ -761,7 +761,7 @@
     const webFrame = document.getElementById('webFrame'); 
     
     websiteLink.addEventListener('click',  () => {
-        webFrame.src = 'http://www.080207.xyz'; // 设置iframe源
+        webFrame.src = 'https://www.080207.xyz'; // 设置iframe源
         websiteContainer.classList.add('visible'); 
         document.body.style.overflow  = 'hidden';
     });
