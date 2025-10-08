@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>字数慧眼 · TextScope</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "st8aaa87q9");
+  </script>
+    
+  <style>
+    :root{
+      --bg:#f5f5f7;
+      --card:#ffffff;
+      --muted:#6e6e73;
+      --text:#1d1d1f;
+      --accent:#0071e3;
+      --accent-strong:#0060cc;
+      --radius:14px;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md: 0 6px 20px rgba(0,0,0,0.08);
+      --max-width:980px;
+      --editor-max-height: 520px; /* 标亮区域最大高度，可按需调整 */
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%; margin:0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text","Helvetica Neue", Helvetica, Arial, sans-serif; -webkit-font-smoothing:antialiased}
+    body {
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 32px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+
+    .page {
+      width: 100%;
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 28px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0.55));
+      border-radius: calc(var(--radius) + 2px);
+      box-shadow: var(--shadow-md);
+      border: 1px solid rgba(0,0,0,0.04);
+    }
+
+    h2 { margin:0; font-size:28px; font-weight:600; color:var(--text) }
+    .intro { margin-top:6px; margin-bottom:20px; color:var(--muted); font-size:15px }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 20px;
+      align-items: start;
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.95), var(--card));
+      border-radius: var(--radius);
+      padding: 16px;
+      border: 1px solid rgba(0,0,0,0.04);
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* 关键：输入框与高亮视图共享样式确保等宽 */
+    .editor-area {
+      width: 100%;
+      display: block;
+      font-size: 16px;
+      line-height: 1.7;
+      padding: 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(0,0,0,0.06);
+      background: linear-gradient(180deg,#fff,#fbfbfc);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.6), 0 4px 12px rgba(18,18,18,0.03);
+      color: var(--text);
+      outline: none;
+      transition: box-shadow 160ms, border-color 160ms, transform 160ms;
+      box-sizing: border-box; /* 确保 padding 包含在宽度内 */
+      overflow-wrap: break-word;
+      word-break: break-word;
+    }
+
+    textarea#editor {
+      min-height: 260px;
+      resize: vertical;
+      width: 100%;
+    }
+    .highlight-view {
+      display: none;
+      min-height: 260px;
+      width: 100%;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      overflow-x: hidden;     /* 防止横向滚动 */
+      overflow-y: auto;       /* 允许垂直滚动 */
+      max-height: var(--editor-max-height); /* 内容超过此高度可滚轮查看 */
+    }
+
+    textarea#editor:focus {
+      border-color: rgba(0,113,227,0.16);
+      box-shadow: 0 6px 18px rgba(0,113,227,0.08);
+      transform: translateY(-1px);
+    }
+
+    .sidebar { display:flex; flex-direction:column; gap:12px; position:relative; min-height:200px }
+    .stat-row { display:flex; justify-content:space-between; align-items:center; padding:10px 12px; border-radius:10px; background: linear-gradient(180deg, rgba(250,250,251,0.6), rgba(255,255,255,0.65)); border:1px solid rgba(0,0,0,0.03); box-shadow: var(--shadow-sm); font-size:15px; color:var(--text) }
+    .stat-row .label { color: var(--muted); font-weight:600; font-size:13px }
+    .stat-row .value { font-weight:700; color:var(--text) }
+
+    .controls { display:flex; gap:10px; margin-top:12px; flex-wrap:wrap }
+    button {
+      padding: 8px 16px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      font-weight:600;
+      font-size: 15px;
+      color: #fff;
+      background: linear-gradient(180deg,var(--accent),var(--accent-strong));
+      box-shadow: 0 6px 16px rgba(0,113,227,0.12);
+      transition: transform 120ms ease, box-shadow 120ms ease;
+    }
+    button:hover { transform: translateY(-2px) }
+    button.ghost {
+      background: linear-gradient(180deg, rgba(0,0,0,0.03), rgba(0,0,0,0.01));
+      color: var(--text);
+      box-shadow: none;
+      border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .result { margin-top:14px; white-space: pre-line; font-size:15px; border-radius:12px; padding:12px; background: linear-gradient(180deg,#fff,#fafafb); border:1px solid rgba(0,0,0,0.04); box-shadow: var(--shadow-sm); color:var(--text) }
+
+    .hl-chinese { background: rgba(255,59,48,0.12); padding: 0 2px; border-radius:6px; }
+    .hl-english { background: rgba(0,122,255,0.12); padding: 0 2px; border-radius:6px; }
+    .hl-number  { background: rgba(255,149,0,0.12); padding: 0 2px; border-radius:6px; }
+    .hl-punct   { background: rgba(52,199,89,0.12); padding: 0 2px; border-radius:6px; }
+    .hl-space   { background: rgba(142,142,147,0.16); padding: 0 2px; border-radius:6px; color: rgba(0,0,0,0.6) }
+
+    .badge { display:inline-block; padding:6px 10px; border-radius:999px; font-weight:700; font-size:13px; color:#fff }
+    .badge.ch { background: rgba(255,59,48,1) }
+    .badge.en { background: rgba(0,122,255,1) }
+    .badge.num{ background: rgba(255,149,0,1) }
+    .badge.pun{ background: rgba(52,199,89,1) }
+    .badge.sp { background: rgba(142,142,147,1) }
+
+    .top-row { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:14px; flex-wrap:wrap }
+    .title-wrap { display:flex; flex-direction:column; gap:6px }
+
+    @media (max-width: 880px) {
+      .layout { grid-template-columns: 1fr 300px; }
+      .page { padding: 20px; }
+    }
+    @media (max-width: 720px) {
+      .layout { grid-template-columns: 1fr; }
+      .sidebar { order: 2; }
+      .card { padding: 14px; }
+      textarea#editor, .highlight-view { min-height: 200px; }
+      .stat-row { padding: 10px; }
+      button { padding: 8px 12px; font-size:14px }
+    }
+    @media (max-width: 420px) {
+      body { padding: 16px }
+      .page { padding: 14px; border-radius: 12px }
+      h2 { font-size: 20px }
+      .intro { font-size: 13px }
+      textarea#editor, .highlight-view { min-height: 160px }
+    }
+
+    @media print {
+      body { background: #fff; padding:0 }
+      .page { box-shadow:none; border: none; max-width: 100%; padding: 0 }
+      .controls, button { display:none }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="top-row">
+      <div class="title-wrap">
+        <h2>字数慧眼 · TextScope</h2>
+        <div class="intro">精准统计，清晰标亮，掌控每个字词</div>
+      </div>
+      <div style="display:flex; align-items:center; gap:10px;">
+        <div style="font-size:13px; color:var(--muted)">就绪</div>
+      </div>
+    </div>
+
+    <div class="layout">
+      <div class="card" style="min-height:320px;">
+        <!-- 编辑区 -->
+        <textarea id="editor" class="editor-area" placeholder="在这里输入或粘贴文本..."></textarea>
+
+        <!-- 标亮预览：与 textarea 同样的宽度与 padding；启用纵向滚动 -->
+        <div id="highlightView" class="editor-area highlight-view" aria-hidden="true" style="display:none; margin-top:12px;"></div>
+
+        <div class="controls" style="margin-top:12px;">
+          <button id="toggleBtn">标亮</button>
+          <button id="cleanMdBtn" class="ghost">去除 Markdown 符号</button>
+        </div>
+
+        <div class="result" id="result" style="margin-top:14px;"></div>
+      </div>
+
+      <aside class="sidebar">
+        <div class="card" style="padding:12px;">
+          <div style="font-weight:700; margin-bottom:8px;">统计概览</div>
+          <div class="stats">
+            <div class="stat-row"><div class="label">中文汉字</div><div class="value" id="stat-ch">0</div></div>
+            <div class="stat-row"><div class="label">英文单词</div><div class="value" id="stat-en">0</div></div>
+            <div class="stat-row"><div class="label">数字</div><div class="value" id="stat-num">0</div></div>
+            <div class="stat-row"><div class="label">标点</div><div class="value" id="stat-pun">0</div></div>
+            <div class="stat-row"><div class="label">空格</div><div class="value" id="stat-sp">0</div></div>
+          </div>
+        </div>
+
+        <div class="card" style="padding:12px; display:flex; flex-direction:column; gap:8px;">
+          <div style="font-weight:700;">操作提示</div>
+          <div style="color:var(--muted); font-size:13px; line-height:1.45;">
+            标亮：切换到高亮预览并统计各类字符。<br/>
+            去除 Markdown：尝试删除常见 Markdown 标记。
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    const editor = document.getElementById('editor');
+    const highlightView = document.getElementById('highlightView');
+    const toggleBtn = document.getElementById('toggleBtn');
+    const cleanMdBtn = document.getElementById('cleanMdBtn');
+    const result = document.getElementById('result');
+
+    const statCh = document.getElementById('stat-ch');
+    const statEn = document.getElementById('stat-en');
+    const statNum = document.getElementById('stat-num');
+    const statPun = document.getElementById('stat-pun');
+    const statSp = document.getElementById('stat-sp');
+
+    const reChinese = /^[\u4e00-\u9fa5]$/;
+    const reEnglish = /^[a-zA-Z]+(?:'[a-zA-Z]+)?$/;
+    const reNumber  = /^\d+(?:\.\d+)?$/;
+    const rePunct   = /^[，。！？、；：（）《》「」『』—…·,\.!?;:()\[\]{}"'“”‘’\-]$/;
+    const reSpace   = /^[ \t]$/;
+    const markdownRegex = /(#{1,6}|`{1,3}|\*{2,}|-{3,}|_{3,}|^\s*[-\*+]\s+|^>\s+|!\[[^\]]*\]\([^\)]*\)|\[[^\]]*\]\([^\)]*\))/gm;
+
+    function escapeHTML(s) {
+      return s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+    }
+
+    function analyzeAndHighlight(text) {
+      let chineseCount=0, englishCount=0, numberCount=0, punctCount=0, spaceCount=0;
+      const tokens = text.match(/[\u4e00-\u9fa5]|[a-zA-Z]+(?:'[a-zA-Z]+)?|\d+(?:\.\d+)?|[，。！？、；：（）《》「」『』—…·,\.!?;:()\[\]{}"'“”‘’\-]|[ \t]|\n/g) || [];
+      let html = '';
+      tokens.forEach(tok => {
+        const esc = escapeHTML(tok);
+        if (reChinese.test(tok)) { chineseCount++; html += `<span class="hl-chinese">${esc}</span>`; }
+        else if (reEnglish.test(tok)) { englishCount++; html += `<span class="hl-english">${esc}</span>`; }
+        else if (reNumber.test(tok)) { numberCount++; html += `<span class="hl-number">${esc}</span>`; }
+        else if (rePunct.test(tok)) { punctCount++; html += `<span class="hl-punct">${esc}</span>`; }
+        else if (reSpace.test(tok)) { spaceCount++; html += `<span class="hl-space">${esc.replace(/ /g,'·').replace(/\t/,'→\t')}</span>`; }
+        else { html += esc; }
+      });
+      highlightView.innerHTML = html;
+      statCh.textContent = chineseCount;
+      statEn.textContent = englishCount;
+      statNum.textContent = numberCount;
+      statPun.textContent = punctCount;
+      statSp.textContent = spaceCount;
+
+      result.innerHTML =
+        `<span class="badge ch">中文 ${chineseCount}</span> ` +
+        `<span class="badge en">英 ${englishCount}</span> ` +
+        `<span class="badge num">数 ${numberCount}</span> ` +
+        `<span class="badge pun">标 ${punctCount}</span> ` +
+        `<span class="badge sp">空 ${spaceCount}</span>`;
+    }
+
+    // 在切换到高亮视图时，把当前编辑框高度赋给高亮框以保证初始可视高度一致
+    function showHighlightView() {
+      // 保证宽度一致：两者宽度由 CSS width:100% 控制
+      const editorHeight = editor.getBoundingClientRect().height;
+      highlightView.style.height = editorHeight + 'px';
+      highlightView.style.display = 'block';
+      highlightView.setAttribute('aria-hidden', 'false');
+      editor.style.display = 'none';
+      toggleBtn.textContent = '编辑';
+    }
+
+    function showEditorView() {
+      // 清除显式高度，让 textarea 恢复可调整高度
+      highlightView.style.display = 'none';
+      highlightView.style.height = '';
+      highlightView.setAttribute('aria-hidden', 'true');
+      editor.style.display = 'block';
+      toggleBtn.textContent = '标亮';
+    }
+
+    editor.addEventListener('input', () => { analyzeAndHighlight(editor.value); });
+
+    toggleBtn.addEventListener('click', () => {
+      if (editor.style.display !== 'none') {
+        analyzeAndHighlight(editor.value);
+        showHighlightView();
+      } else {
+        showEditorView();
+      }
+    });
+
+    cleanMdBtn.addEventListener('click', () => {
+      let text = editor.value;
+      if (markdownRegex.test(text)) {
+        if (confirm("检测到 Markdown 符号，是否去除？")) {
+          text = text.replace(markdownRegex, "");
+          editor.value = text;
+          analyzeAndHighlight(text);
+        }
+      } else {
+        alert("未检测到 Markdown 符号。");
+      }
+    });
+
+    // 让初始统计显示并确保高亮内容随窗口尺寸自适应
+    analyzeAndHighlight('');
+
+    // 当窗口大小改变时，重新同步显示高度（如果高亮视图可见）
+    window.addEventListener('resize', () => {
+      if (highlightView.style.display === 'block') {
+        const editorHeight = editor.getBoundingClientRect().height;
+        highlightView.style.height = editorHeight + 'px';
+      }
+    });
+
+    // 鼠标滚轮滚动高亮视图时，保持容器滚动正常（已通过 overflow-y:auto 实现）
+    // 无需额外逻辑，浏览器会处理。
+  </script>
+</body>
+</html>
